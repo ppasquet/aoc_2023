@@ -1,5 +1,5 @@
 advent_of_code::solution!(2);
-use regex::{Regex, RegexSet};
+use regex::Regex;
 
 const LIMIT: (u32, u32, u32) = (12, 13, 14);
 fn find_color_cubes(draw: &str) -> (u32, u32, u32) {
@@ -45,7 +45,25 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let res = input.split("\n").fold(0, |acc, game| {
+        let game_power: u32 = match game.split(":").last() {
+            Some(draws) => {
+                let mut mr = 0;
+                let mut mg = 0;
+                let mut mb = 0;
+                for draw in draws.split(";") {
+                    let (r, g, b) = find_color_cubes(draw);
+                    mr = std::cmp::max(mr, r);
+                    mg = std::cmp::max(mg, g);
+                    mb = std::cmp::max(mb, b);
+                }
+                mr * mg * mb
+            },
+            _ => 0, // No game info
+        };
+        acc + game_power
+    });
+    Some(res)
 }
 
 #[cfg(test)]
@@ -55,12 +73,12 @@ mod tests {
     #[test]
     fn test_part_one() {
         let result = part_one(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(8));
     }
 
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(2286));
     }
 }

@@ -6,9 +6,22 @@ use std::ops::Range;
 
 fn read_seeds(seeds_row: &str) -> Vec<i64> {
     let seed_id_regex: Regex = Regex::new(r"\d+").unwrap();
-    seed_id_regex
+    return seed_id_regex
         .find_iter(seeds_row)
-        .filter_map(|m| m.as_str().parse::<i64>().ok()).collect::<Vec<_>>()
+        .filter_map(|m| m.as_str().parse::<i64>().ok()).collect::<Vec<_>>();
+}
+
+fn read_seed_ranges(seeds_row: &str) -> Vec<Range<i64>> {
+    let seed_id_regex: Regex = Regex::new(r"\d+").unwrap();
+    let seed_ranges = seed_id_regex
+        .find_iter(seeds_row)
+        .filter_map(|m| m.as_str().parse::<i64>().ok())
+        .collect::<Vec<_>>()
+        .chunks_exact(2)
+        .map(|chunk| {
+            chunk[0]..chunk[0]+chunk[1]
+        }).collect::<Vec<Range<i64>>>();
+    seed_ranges
 }
 
 fn read_mapping(mapping_row: &str) -> (Range<i64>, i64) {
@@ -46,7 +59,31 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let mut sections = input.split_terminator("\n\n");
+    let seeds_row = sections.next().unwrap_or("");
+    let seed_ranges = read_seed_ranges(&seeds_row);
+    let transitions = sections.map(|section| {
+    })
+    // seed_ranges.fold(0, |shortest, seed_range| {
+    //
+    // })
+    // println!("{:?}", seeds);
+
+    // let transitions = sections.map(|section| {
+    //     section.split_terminator("\n").skip(1).map(|mapping_row| {
+    //         read_mapping(&mapping_row)
+    //     }).collect::<Vec<(Range<i64>, i64)>>()
+    // });
+    // let locations = transitions.fold(seeds, |step_vals, step_mappings| {
+    //     step_vals.iter().map(|step_val| {
+    //         match step_mappings.iter()
+    //             .find(|step_mapping| step_mapping.0.contains(&step_val)) {
+    //                 Some((_, offset)) => step_val + offset,
+    //                 _ => *step_val,
+    //             }
+    //     })
+    // });
+    Some(123)
 }
 
 #[cfg(test)]
@@ -62,6 +99,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(46));
     }
 }
